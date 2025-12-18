@@ -1,0 +1,33 @@
+async function askGemini() {
+    const input = document.getElementById('userInput').value;
+    const btn = document.getElementById('submitBtn');
+    const loader = document.getElementById('loader');
+    const results = document.getElementById('results');
+
+    if (!input) {
+        alert("Please enter an idea!");
+        return;
+    }
+
+    btn.disabled = true;
+    loader.style.display = "block";
+    results.style.display = "none";
+
+    try {
+        // We call our OWN serverless function instead of Google directly
+        const response = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idea: input })
+        });
+
+        const cleanJson = await response.json();
+        displayResults(cleanJson);
+    } catch (error) {
+        console.error(error);
+        alert("Error: Make sure your Vercel Env Variable is set!");
+    } finally {
+        btn.disabled = false;
+        loader.style.display = "none";
+    }
+}
