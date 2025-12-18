@@ -1,0 +1,37 @@
+// Inside your index.html script tag
+async function askGemini() {
+    const input = document.getElementById('userInput').value;
+    const btn = document.getElementById('submitBtn');
+    const loader = document.getElementById('loader');
+    
+    // 1. Clear previous results
+    document.getElementById('results').style.display = "none";
+    
+    if (!input) {
+        alert("Please enter a business idea first!");
+        return;
+    }
+
+    loader.style.display = "block";
+    btn.disabled = true;
+
+    try {
+        // 2. This calls the file in your /api folder
+        const response = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idea: input })
+        });
+
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const cleanJson = await response.json();
+        displayResults(cleanJson);
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        alert("API Error: Check if GEMINI_API_KEY is set in Vercel Settings.");
+    } finally {
+        loader.style.display = "none";
+        btn.disabled = false;
+    }
+}
